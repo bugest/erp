@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.am.modules.project.dao.mybatis.PRJProjectDao">
+    
+	<select id="findMan" resultType="PersonShowListModel">
+		SELECT 
+			distinct tp.fid as id,tp.fdisplayname as name from am_Tproject2 tp2
+			join tperson tp on tp.fid = tp2.ProjectManager
+	</select>
+	
+</mapper>

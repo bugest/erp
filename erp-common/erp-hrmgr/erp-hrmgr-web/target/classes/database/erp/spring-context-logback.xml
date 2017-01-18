@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+	<appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
+		<Target>System.out</Target>
+		<Encoding>UTF-8</Encoding>
+		<layout class="ch.qos.logback.classic.PatternLayout">
+			<pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%X{current_tenant_id}] [%X{current_user_name}] - [ %t ] - [ %c{1} ] - [ %M:%L ] - [ %p ] %m%n</pattern>
+		</layout>
+	</appender>
+	<appender name="rfappender"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<Append>true</Append>
+		<File>${catalina.base}/logs/material/diary/material_rolling</File>
+		<layout class="ch.qos.logback.classic.PatternLayout">
+			<pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%X{current_tenant_id}] [%X{current_user_name}] - [ %t ] - [ %c{1} ] - [ %M:%L ] - [ %p ] %m%n</pattern>
+		</layout>
+		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+			<level>TRACE</level>
+		</filter>
+		<rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+			<maxIndex>100</maxIndex>
+			<FileNamePattern>${catalina.base}/logs/material/diary/rolling.%i</FileNamePattern>
+		</rollingPolicy>
+		<triggeringPolicy
+			class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+			<MaxFileSize>2048KB</MaxFileSize>
+		</triggeringPolicy>
+	</appender>
+	<appender name="efappender" class="ch.qos.logback.core.FileAppender">
+		<File>${catalina.base}/logs/material/material_error.log</File>
+		<Append>true</Append>
+		<layout class="ch.qos.logback.classic.PatternLayout">
+			<pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%X{current_tenant_id}] [%X{current_user_name}] - [ %t ] - [ %c{1} ] - [ %M:%L ] - [ %p ] %m%n</pattern>
+		</layout>
+		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+			<level>ERROR</level>
+		</filter>
+	</appender>
+	<appender name="Business" class="ch.qos.logback.core.FileAppender">
+		<File>${catalina.base}/logs/material/material_bpm.log</File>
+		<Append>true</Append>
+		<layout class="ch.qos.logback.classic.PatternLayout">
+			<pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%X{current_tenant_id}] [%X{current_user_name}] - [ %t ] - [ %c{1} ] - [ %M:%L ] - [ %p ] %m%n</pattern>
+		</layout>
+	</appender>
+	<appender name="Context" class="ch.qos.logback.core.FileAppender">
+		<File>${catalina.base}/logs/material/material_context.log</File>
+		<Append>true</Append>
+		<layout class="ch.qos.logback.classic.PatternLayout">
+			<pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%X{current_tenant_id}] [%X{current_user_name}] - [ %t ] - [ %c{1} ] - [ %M:%L ] - [ %p ] %m%n</pattern>
+		</layout>
+	</appender>
+	<logger name="com.yyjz.icop.approve" level="ERROR" additivity="false">
+		<appender-ref ref="Business" />
+	</logger>
+	<logger name="com.yyjz.icop.pub.utils.AppContext" level="ERROR" additivity="false">
+		<appender-ref ref="Context" />
+	</logger>
+	<logger name="org.quartz" level="OFF" />
+	<logger name="org.springframework" level="ERROR" />
+	<logger name="com.yyjz.icop" level="ERROR" />
+	<logger name="org.springframework.web.servlet.handler" level="ERROR" />
+	<logger name="org.springframework.web.servlet.DispatcherServlet" level="ERROR" />
+	<logger name="org.springframework.web.servlet.mvc.method.annotation" level="ERROR" />
+	<logger name="org.springframework.web.context.support" level="ERROR" />
+	<!-- <logger name="org.springframework.data.repository.config" level="ERROR" />
+	<logger name="org.springframework.data.repository.config.RepositoryComponentProvider" level="ERROR" /> -->
+	<logger name="org.springframework.core" level="ERROR" />
+	<logger name="org.springframework.core.io.support" level="ERROR" />
+	<logger name="org.springframework.core.io.support.PathMatchingResourcePatternResolver" level="ERROR" />
+	<logger name="org.springframework.orm" level="ERROR" />
+	<logger name="org.springframework.context.annotation.ClassPathBeanDefinitionScanner" level="ERROR" />
+	<logger name="org.springframework.beans.factory.xml.BeanDefinitionParserDelegate" level="ERROR" />
+	<logger name="org.springframework.beans.factory.xml.PluggableSchemaResolver" level="ERROR" />
+	<logger name="org.springframework.beans.factory.support.DefaultListableBeanFactory" level="ERROR" />
+	<logger name="org.hibernate" level="ERROR" />
+	<logger name="org.hibernate.cfg" level="ERROR" />
+	<logger name="org.hibernate.type" level="ERROR" />
+	<logger name="org.hibernate.jpa.internal.QueryImpl" level="ERROR" />
+	<logger name="org.hibernate.loader" level="ERROR" />
+	<logger name="org.hibernate.type.descriptor.sql.BasicExtractor" level="ERROR" />
+	<logger name="org.hibernate.type.BasicTypeRegistry" level="ERROR" />
+	<logger name="org.hibernate.persister" level="ERROR" />
+	<logger name="com.yonyou.iuap.dynamicds" level="ERROR" />
+	<logger name="org.apache.shiro.session.mgt" level="ERROR" />
+	<logger name="com.alibaba.dubbo" level="ERROR" />
+	<logger name="com.alibaba.dubbo.remoting.exchange.support.header" level="ERROR" />
+	<logger name="org.apache.zookeeper.ClientCnxn" level="ERROR" />
+	<logger name="org.apache.shiro" level="ERROR" />
+	<logger name="org.apache.commons.beanutils.converters" level="ERROR" />
+	<logger name="com.yyjz.icop.pub.business" level="ERROR" additivity="true">
+		<appender-ref ref="Business" />
+	</logger>
+	<root level="ERROR" >
+		<appender-ref ref="stdout" />
+		<appender-ref ref="rfappender" />
+		<appender-ref ref="efappender" />
+	</root>
+</configuration>

@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:jpa="http://www.springframework.org/schema/data/jpa" xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.2.xsd
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+        http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.2.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.2.xsd
+        http://www.springframework.org/schema/data/jpa http://www.springframework.org/schema/data/jpa/spring-jpa-1.8.xsd"
+	default-lazy-init="true">
+	<description>Spring Configuration</description>
+
+	<!-- 如果spring用了jpa，并且类型为LocalContainerEntityManagerFactoryBean，则组件注册在此配置文件出现即可，其余配置文件可忽略 
+		使用component来替代annotation 自动注册bean, 并保证@Required、@Autowired的属性被注入\ -->
+	<context:component-scan base-package="com.yyjz.icop.matadata,com.erp.web,com.yyjz.icop.base,com.yyjz.icop.utils" />
+	
+	<bean id="erp-dataSourceProxy"
+		class="org.springframework.jdbc.datasource.TransactionAwareDataSourceProxy">
+		<property name="targetDataSource" ref="erp-DataSource" />
+	</bean>
+
+
+	<!-- 定义实体管理器工厂 Jpa配置 LocalContainerEntityManagerFactoryBean这个选项Spring扮演了容器的角色。完全掌管JPA -->
+	<bean id="erp-entityManagerFactory"
+		class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+		<!-- 指定数据源 -->
+		<property name="dataSource" ref="erp-dataSourceProxy" />
+		<!-- 指定Jpa持久化实现厂商类,这里以Hibernate为例 -->
+		<property name="jpaVendorAdapter" ref="erp-hibernateJpaVendorAdapter" />
+		<!-- 指定Entity实体类包路径 -->
+		<property name="packagesToScan">
+			<array>
+			<value>com.yyjz.icop.matadata.entity</value>
+<!-- 			<value>org.am.modules.scm.**.entity</value>
+				<value>org.am.modules.scm.**.model</value>
+				<value>org.am.modules.cost.**.entity</value>
+				<value>org.am.modules.mes.**.entity</value>
+				<value>org.am.modules.pln.**.entity</value>
+				<value>org.am.modules.prj.**.entity</value>
+				<value>org.am.modules.common.**.entity</value>
+				<value>org.am.modules.sys.**.entity</value>
+				<value>org.am.modules.hr.**.entity</value>
+				<value>org.am.modules.pdm.**.entity</value> -->
+			</array>
+		</property>
+		<!-- 指定JPA属性；如Hibernate中指定是否显示SQL的是否显示、方言等 -->
+		<property name="jpaProperties">
+			<props>
+				<prop key="hibernate.ejb.entitymanager_factory_name">erp-entityManagerFactory</prop>
+				<prop key="hibernate.dialect">${jdbc.erp.hibernate.dialect}</prop>
+				<!-- <prop key="hibernate.ejb.naming_strategy">org.hibernate.cfg.ImprovedNamingStrategy</prop> -->
+				<prop key="hibernate.cache.provider_class">org.hibernate.cache.NoCacheProvider</prop>
+				<prop key="hibernate.show_sql">${jdbc.erp.hibernate.show_sql}</prop>
+				<prop key="hibernate.format_sql">${jdbc.erp.hibernate.format_sql}</prop>
+				<prop key="hibernate.hbm2ddl.auto">${jdbc.erp.hibernate.hbm2ddl.auto}</prop>
+				<prop key="hibernate.enable_lazy_load_no_trans">true</prop>
+			
+				<!-- 拦截器 -->
+				<!-- <prop key="hibernate.ejb.interceptor">org.am.core.interceptor.HibernateI18nInterceptor
+				</prop> -->
+				<!-- 监听器 -->
+				<!-- <prop key="hibernate.ejb.event.save-update">org.am.core.listener.HibernateSaveUpdateListener
+				</prop>
+				<prop key="hibernate.ejb.event.save">org.am.core.listener.HibernateSaveListener</prop>
+				<prop key="hibernate.ejb.event.post-insert">org.am.core.listener.HibernatePostInsertListener</prop>
+				post-update
+				<prop key="hibernate.ejb.event.post-load">org.am.core.listener.HibernatePostLoadListener</prop> -->
+			</props>
+		</property>
+	</bean>
+
+	<!-- 重要配置：启用扫描并自动创建代理的功能 -->
+	<jpa:repositories
+		base-package="org.am.modules.scm.**.dao.jpa,
+	com.yyjz.icop.matadata.dao,com.yyjz.icop.base.dao,
+	com.yyjz.icop.utils,
+	org.am.modules.mes.**.dao.jpa,
+	org.am.modules.pln.**.dao.jpa,
+	org.am.modules.prj.**.dao.jpa,
+	org.am.modules.sys.**.dao.jpa,
+	org.am.modules.common.**.dao.jpa,
+	org.am.modules.hr.**.dao.jpa,
+	org.am.modules.pdm.**.dao.jpa"
+		transaction-manager-ref="erp-transactionManager"
+		entity-manager-factory-ref="erp-entityManagerFactory" />
+
+	<!-- Hibernate对Jpa的实现 -->
+	<bean id="erp-hibernateJpaVendorAdapter"
+		class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter" />
+
+	<!-- Jpa 事务管理器 -->
+	<bean id="erp-transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+		<property name="entityManagerFactory" ref="erp-entityManagerFactory" />
+	</bean>
+
+	<!-- 开启注解事务 -->
+	<tx:annotation-driven transaction-manager="erp-transactionManager" />
+	<!-- <tx:annotation-driven transaction-manager="erp-transactionManager" 
+		proxy-target-class="true" /> -->
+
+	<!-- 启动对@AspectJ（面向切面）注解的支持 -->
+	<!-- <aop:aspectj-autoproxy proxy-target-class="true" /> -->
+	
+</beans>
